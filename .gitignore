@@ -1,0 +1,6 @@
+.cache
+*.mp3
+build
+compile_commands.json
+mp
+*/*ft
