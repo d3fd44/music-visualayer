@@ -102,8 +102,8 @@ int main(int argc, char *argv[])
         for (int i = 0; i < bars; i += 2)
         {
             // take average over 2 frequencies
-            float magleftc = cabsf(freqs1[i] + freqs1[i + 1]) / 2;
-            float magrightc = cabsf(freqs2[i] + freqs2[i + 1]) / 2;
+            float magleftc = (cabsf(freqs1[i]) + cabsf(freqs1[i + 1])) / 2;
+            float magrightc = (cabsf(freqs2[i]) + cabsf(freqs2[i + 1])) / 2;
 
             float logleftc = log10f(magleftc + 1);  // 1 to prevent log10(0)
             float logrightc = log10f(magrightc + 1);
