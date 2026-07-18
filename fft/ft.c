@@ -1,7 +1,5 @@
 #include "ft.h"
 
-// #define PI8 pi / 8
-
 double pi;
 
 void dft(float *inv, float complex *outv, size_t n)
@@ -37,38 +35,3 @@ void fft(float *inv, float complex *outv, size_t n, int step)
         outv[i + n / 2] = e - v;
     }
 }
-
-// int main()
-// {
-//     pi = atan2(1, 1) * 4;
-//
-//     float         in[1024 * 128];
-//     float complex out[1024 * 128] = { 0 };
-//
-//     for (size_t i = 0; i < 1024 * 128; i++)
-//         in[i] = cosf(PI8 * i) + sinf(PI8 * 3 * i) + sinf(pi * i * 7.3f);
-//
-//     fft(in, out, 1024 * 128, 1);
-//
-//     printf("in : ");
-//     for (size_t i = 0; i < 1024; i++)
-//         printf("% 5.3f ", in[i]);
-//
-//     printf("\nout: ");
-//     for (size_t i = 0; i < 1024; i++)
-//         printf("% 5.3f ", cabsf(out[i]));
-//
-//     printf("\n");
-//
-//     dft(in, out, 1024 * 128);
-//     printf("in : ");
-//     for (size_t i = 0; i < 1024; i++)
-//         printf("% 5.3f ", in[i]);
-//
-//     printf("\nout: ");
-//     for (size_t i = 0; i < 1024; i++)
-//         printf("% 5.3f ", cabsf(out[i]));
-//
-//     printf("\n");
-//     return 0;
-// }
