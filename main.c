@@ -21,6 +21,7 @@ float         c1s   [MAX_FRAMES_COUNT] = { 0 }; // channel 1 samples
 float         c2s   [MAX_FRAMES_COUNT] = { 0 }; // channel 2 samples
 float complex freqs1[MAX_FRAMES_COUNT] = { 0 }; // FFT of c1s
 float complex freqs2[MAX_FRAMES_COUNT] = { 0 }; // FFT of c2s
+Color         grspec[128]              = { 0 }; // green-red color spectrum
 // clang-format on
 
 void get_data(void *fstream, unsigned int count)
@@ -46,6 +47,9 @@ int main(int argc, char *argv[])
     cam.target = (Vector2){ 0.0f, 0.0f };
     cam.offset = (Vector2){ 0.0f, screenHeight };
     cam.zoom = 1.0f;
+
+    for (int i = 0; i < 256; i += 2)
+        grspec[i / 2] = (Color){ i, 256 - i, 0, 255 };
 
     InitAudioDevice();
 
@@ -147,7 +151,7 @@ int main(int argc, char *argv[])
                     Vector2 pos = { x, y - 100 };
                     Vector2 size = { rectw, recth };
 
-                    DrawRectangleV(pos, size, GREEN);
+                    DrawRectangleV(pos, size, i < 128 ? grspec[i] : grspec[255 - i]);
                 }
 
             EndMode2D();
