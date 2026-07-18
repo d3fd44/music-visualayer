@@ -58,8 +58,8 @@ int main(int argc, char *argv[])
 
     // for smooth transition
     float lastnormal[256] = { 0 };
-    float raise = 0.3f;
-    float decay = 0.15f;
+    float raise = 0.15f;
+    float decay = 0.075f;
 
     while (!WindowShouldClose())
     {
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
                     if (normal < lastnormal[i]) lastnormal[i] += (normal - lastnormal[i]) * decay;
                     if (normal > lastnormal[i]) lastnormal[i] += (normal - lastnormal[i]) * raise;
 
-                    float recth = lastnormal[i] * maxpreview;
+                    float recth = lastnormal[i] * maxpreview * 2;
                     float rectw = dx * 0.7;
                     float x = (i * dx * 2);
                     float y = -recth;
