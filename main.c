@@ -144,8 +144,8 @@ int main(int argc, char *argv[])
                     if (normal > lastnormal[i]) lastnormal[i] += (normal - lastnormal[i]) * raise;
 
                     float recth = lastnormal[i] * previewheight * 2;
-                    float rectw = dx;
-                    float x = (i * dx * 2);
+                    float rectw = dx * 0.8f;
+                    float x = (2 * i * dx) + 0.1f;
                     float y = -recth;
 
                     Vector2 pos = { x, y - 100 };
