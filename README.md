@@ -1,7 +1,11 @@
 ## Music Visualayer
 > still in early development stage! (and might never leave it)
 
-https://github.com/user-attachments/assets/754b59ca-4848-491c-8206-69f3cf57ab88
+
+
+https://github.com/user-attachments/assets/6557e940-e7d3-4c64-a35c-e062fa507a9c
+
+
 
 dependencies:
 - raylib
