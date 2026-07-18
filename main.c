@@ -1,13 +1,14 @@
 #include <complex.h>
 #include <math.h>
 #include <raylib.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "fft/ft.h"
 
-#define MAX_FRAME_SIZE 512
-#define UNIT_SIZE      25
+#define MAX_FRAMES_COUNT 512
+#define UNIT_SIZE        25
 
 typedef struct Frame
 {
@@ -15,11 +16,11 @@ typedef struct Frame
 } Frame;
 
 // clang-format off
-Frame         frames[MAX_FRAME_SIZE] = { 0 }; // frames read from the callback
-float         c1s   [MAX_FRAME_SIZE] = { 0 }; // channel 1 samples
-float         c2s   [MAX_FRAME_SIZE] = { 0 }; // channel 2 samples
-float complex freqs1[MAX_FRAME_SIZE] = { 0 }; // FFT of c1s
-float complex freqs2[MAX_FRAME_SIZE] = { 0 }; // FFT of c2s
+Frame         frames[MAX_FRAMES_COUNT] = { 0 }; // frames read from the callback
+float         c1s   [MAX_FRAMES_COUNT] = { 0 }; // channel 1 samples
+float         c2s   [MAX_FRAMES_COUNT] = { 0 }; // channel 2 samples
+float complex freqs1[MAX_FRAMES_COUNT] = { 0 }; // FFT of c1s
+float complex freqs2[MAX_FRAMES_COUNT] = { 0 }; // FFT of c2s
 // clang-format on
 
 void get_data(void *fstream, unsigned int count)
@@ -38,7 +39,7 @@ int main(int argc, char *argv[])
 
     int   screenHeight = GetScreenHeight();
     int   screenWidth = GetScreenWidth();
-    float maxpreview = screenHeight * 0.75;
+    float previewheight = screenHeight * 0.75;
     float maxlog = 4.0f;  // global scale
 
     Camera2D cam = { 0 };
@@ -53,13 +54,14 @@ int main(int argc, char *argv[])
     PlayMusicStream(m);
     SetMusicVolume(m, 0.5f);
 
-    float dx = (float)(screenWidth) / 512;
     float sec = 0.0f;
 
-    // for smooth transition
-    float lastnormal[256] = { 0 };
-    float raise = 0.15f;
-    float decay = 0.075f;
+    // for smooth transition (keep the last value)
+    int   bars = MAX_FRAMES_COUNT / 2;
+    float dx = (float)(screenWidth) / MAX_FRAMES_COUNT;
+    float lastnormal[MAX_FRAMES_COUNT / 2] = { 0 };  // `bars` but i need it initialized to 0
+    float raise = 0.5f;  // control the speed of increasing/decreasing bar length
+    float fall = 0.275f;
 
     while (!WindowShouldClose())
     {
@@ -79,7 +81,7 @@ int main(int argc, char *argv[])
 
         // clang-format off
         UpdateMusicStream(m);
-        for (int i = 0; i < 512; i++) { c1s[i] = frames[i].c1; c2s[i] = frames[i].c2; }  // copy samples
+        for (int i = 0; i < MAX_FRAMES_COUNT; i++) { c1s[i] = frames[i].c1; c2s[i] = frames[i].c2; }  // copy samples
 
         if (IsKeyPressed(KEY_SPACE))
         {
@@ -88,12 +90,12 @@ int main(int argc, char *argv[])
         }
 
         // perform FFT on copied samples earlier
-        fft(c1s, freqs1, 512, 1);
-        fft(c2s, freqs2, 512, 1);
+        fft(c1s, freqs1, MAX_FRAMES_COUNT, 1);
+        fft(c2s, freqs2, MAX_FRAMES_COUNT, 1);
 
-        float outmags[256] = { 0 };
+        float outmags[bars];
 
-        for (int i = 0; i < 256; i += 2)
+        for (int i = 0; i < bars; i += 2)
         {
             // take average over 2 frequencies
             float magleftc = cabsf(freqs1[i] + freqs1[i + 1]) / 2;
@@ -105,16 +107,16 @@ int main(int argc, char *argv[])
             // frequencies for the left channel goes first (normal - left to right)
             outmags[i / 2] = logleftc;
             // then frequencies for the right channel (reversed right to left)
-            outmags[255 - i / 2] = logrightc;  
+            outmags[(bars - 1) - i / 2] = logrightc;  
         }
 
         BeginDrawing();
             BeginMode2D(cam);
 
                 ClearBackground(BLACK);
-                DrawFPS(0, 0);
+                DrawFPS(0, -screenHeight);
 
-                for (size_t i = 0; i < 256; i++)
+                for (size_t i = 0; i < bars; i++)
                 {
                     float sum = 0.0f;
                     int   smooth_radius = 18;
@@ -126,7 +128,7 @@ int main(int argc, char *argv[])
                         int target = (int)i + j;
 
                         if (target < 0) target = 0;
-                        if (target > 255) target = 255;
+                        if (target > bars - 1) target = bars - 1;
 
                         sum += outmags[target];
                     }
@@ -134,17 +136,18 @@ int main(int argc, char *argv[])
                     float normal = (sum / smooth_count) / maxlog;
                     if (normal > 1.0f) normal = 1.0f;
 
-                    if (normal < lastnormal[i]) lastnormal[i] += (normal - lastnormal[i]) * decay;
+                    if (normal < lastnormal[i]) lastnormal[i] += (normal - lastnormal[i]) * fall;
                     if (normal > lastnormal[i]) lastnormal[i] += (normal - lastnormal[i]) * raise;
 
-                    float recth = lastnormal[i] * maxpreview * 2;
-                    float rectw = dx * 0.7;
+                    float recth = lastnormal[i] * previewheight * 2;
+                    float rectw = dx;
                     float x = (i * dx * 2);
                     float y = -recth;
 
                     Vector2 pos = { x, y - 100 };
                     Vector2 size = { rectw, recth };
-                    DrawRectangleV(pos, size, BLUE);
+
+                    DrawRectangleV(pos, size, GREEN);
                 }
 
             EndMode2D();
