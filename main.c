@@ -64,8 +64,8 @@ int main(int argc, char *argv[])
     int   bars = MAX_FRAMES_COUNT / 2;
     float dx = (float)(screenWidth) / MAX_FRAMES_COUNT;
     float lastnormal[MAX_FRAMES_COUNT / 2] = { 0 };  // `bars` but i need it initialized to 0
-    float raise = 0.5f;  // control the speed of increasing/decreasing bar length
-    float fall = 0.275f;
+    float raise = 0.3f;  // control the speed of increasing/decreasing bar length
+    float fall = 0.095f;
 
     while (!WindowShouldClose())
     {
