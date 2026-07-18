@@ -1,13 +1,13 @@
-LIBS     ?= -lraylib -lm -Ift
-FLAGS    ?= -Wall -Wextra
-CC       ?= gcc
+LIBS     := -lraylib -lm -Ift
+FLAGS    := -Wall -Wextra
+CC       := gcc
 
 BUILDDIR := build
 BINDIR   := $(BUILDDIR)/bin
 OBJDIR   := $(BUILDDIR)/obj
 TARGET   := $(BINDIR)/mp
 
-SRCS     := $(shell find . -type f -name '*.c' | sort)
+SRCS     := $(patsubst ./%,%,$(shell find . -type f -name '*.c' | sort))
 OBJS     := $(patsubst %.c,$(OBJDIR)/%.o,$(SRCS))
 DEPS     := $(OBJS:.o=.d)
 
@@ -26,7 +26,7 @@ $(TARGET): $(OBJS)
 	@printf '%b\n' '$(CYAN)$(BOLD)==>$(RESET) Linking mp...'
 	@mkdir -p $(BINDIR)
 	@$(CC) $(FLAGS) $(OBJS) -o $@ $(LIBS)
-	@if [[ -e mp ]]; then echo "link already exists."; else ln -s $(BINDIR)/mp mp; fi
+	@if [[ -e mp ]]; then echo "symbolic link already exists."; else ln -s $(BINDIR)/mp mp; fi
 	@printf '%b\n' '$(GREEN)DONE.$(RESET)'
 
 $(OBJDIR)/%.o: %.c
