@@ -1,5 +1,5 @@
-## Music Visualayer (visualizer-player)
-> still in early development stage! (and might stick forever).
+## Music Visualayer
+> still in early development stage! (and might never leave it)
 
 dependencies:
 - raylib
